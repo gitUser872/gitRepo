@@ -1,0 +1,62 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using OfficeOpenXml;
+
+class Program
+{
+    static void Main()
+    {
+        // Create column headers
+        List<string> column1 = new List<string> { "Corp Actions", "SpinOffs", "Mandatory Corporate" };
+        string column2 = "WithIn Standards";
+        string column3 = "TotalActions";
+
+        // Sample data for array1 and array2
+        List<string> array1 = new List<string> { "Value1", "Value2", "Value3" };
+        List<string> array2 = new List<string> { "Value4", "Value5", "Value6" };
+
+        // Create an Excel package
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Data");
+
+            // Write column headers to the worksheet
+            for (int i = 1; i <= column1.Count; i++)
+            {
+                worksheet.Cells[1, i].Value = column1[i - 1];
+            }
+
+            worksheet.Cells[1, column1.Count + 1].Value = column2;
+            worksheet.Cells[1, column1.Count + 2].Value = column3;
+
+            // Write data row by row
+            for (int i = 0; i < array1.Count; i++)
+            {
+                int row = i + 2; // Start from the second row
+                for (int j = 1; j <= column1.Count; j++)
+                {
+                    worksheet.Cells[row, j].Value = array1[i];
+                }
+
+                // Check for empty cell in column2 and print values of array1 row-wise
+                if (string.IsNullOrEmpty(column2))
+                {
+                    worksheet.Cells[row, column1.Count + 1].Value = array1[i];
+                }
+
+                // Check for empty cell in column3 and print values of array2 row-wise
+                if (string.IsNullOrEmpty(column3))
+                {
+                    worksheet.Cells[row, column1.Count + 2].Value = array2[i];
+                }
+            }
+
+            // Save the Excel file
+            FileInfo excelFile = new FileInfo("SampleData.xlsx");
+            package.SaveAs(excelFile);
+        }
+
+        Console.WriteLine("Excel file created successfully.");
+    }
+}
