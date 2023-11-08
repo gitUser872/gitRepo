@@ -66,3 +66,55 @@ class Program
 
             FileInfo excelFile = new FileInfo(excelFilePath);
             package.SaveAs(excelFile);
+--
+using System;
+using System.IO;
+using OfficeOpenXml;
+
+class Program
+{
+    static void Main()
+    {
+        // Create Excel package
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("Data");
+
+            // Create row headers
+            worksheet.Cells["A1"].Value = "Corp Actions";
+            worksheet.Cells["A2"].Value = "SpinOffs";
+            worksheet.Cells["A3"].Value = "Mandatory Corporate";
+
+            // Create column headers
+            worksheet.Cells["B1"].Value = "WithIn Standards";
+            worksheet.Cells["C1"].Value = "TotalActions";
+
+            // Sample data for array1 and array2
+            string[] array1 = { "Value1", "Value2", "Value3" };
+            string[] array2 = { "Value4", "Value5", "Value6" };
+
+            // Write data row by row
+            for (int i = 0; i < array1.Length; i++)
+            {
+                int row = i + 2; // Start from the second row
+                worksheet.Cells[row, 2].Value = array1[i]; // Check for empty cell in column2
+                if (string.IsNullOrEmpty(array1[i]))
+                {
+                    worksheet.Cells[row, 2].Value = "No Value"; // Set a default value if it's empty
+                }
+
+                worksheet.Cells[row, 3].Value = array2[i]; // Check for empty cell in column3
+                if (string.IsNullOrEmpty(array2[i]))
+                {
+                    worksheet.Cells[row, 3].Value = "No Value"; // Set a default value if it's empty
+                }
+            }
+
+            // Save the Excel file
+            FileInfo excelFile = new FileInfo("SampleData.xlsx");
+            package.SaveAs(excelFile);
+        }
+
+        Console.WriteLine("Excel file created successfully.");
+    }
+}
