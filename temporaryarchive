@@ -60,3 +60,9 @@ class Program
         Console.WriteLine("Excel file created successfully.");
     }
 }
+--
+ string downloadsFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
+            string excelFilePath = Path.Combine(downloadsFolder, "SampleData.xlsx");
+
+            FileInfo excelFile = new FileInfo(excelFilePath);
+            package.SaveAs(excelFile);
