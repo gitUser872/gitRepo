@@ -163,3 +163,104 @@ class Program
         }
     }
 }
+
+-------------
+ static void Main(string[] args)
+ {
+     //// Object Instances of wmeth class
+     //wmeth obj1 = new wmeth();
+     //wmeth2 obj2 = new wmeth2();
+     //obj1.add();
+     //obj1.executew2();            
+
+     // Dictionary for class1.cs
+     Dictionary<string,string> numberNames = new Dictionary<string,string>();
+     numberNames.Add("one", "1");
+     numberNames.Add("two", "2");
+     numberNames.Add("three", "3");
+
+     //strArray for printcolA - sample data
+     string[,] strArray =
+     {
+         {"1028", "1", "SpinOffs","WithIn Standards","2" },
+         {"1028", "1", "SpinOffs","Total Actions","3" },
+         {"1028", "1", "Mandatory","WithIn Standards","4" },
+         {"1028", "1", "Mandatory","Total Actions","5" },
+         {"1028", "1", "Voluntary","WithIn Standards","6" },
+         {"1028", "1", "Voluntary","Total Actions","7" },
+         {"1028", "1", "Book","On Payable","8" },
+         {"1028", "1", "Book","(P+1)","9" }
+
+     };
+
+     //Object Instances of class1.cs
+     Class1 cobj = new Class1();
+     //cobj.exportToExcel("1028", 1, "SpinOffs", numberNames);
+     cobj.printcolA(strArray);
+ }
+++
+class Class1
+{
+    string[] key = { "WithIn Standards", "Total Actions", "On Payable", "(P+1)" };
+
+    //this functionis for feeding the array with data from TD-KPI original code
+    public void exportToExcel(string bankId, int MatrixId, string MatrixName, Dictionary<string, string> ResData)
+    {
+        string[,] strArray = new String[100, 5];
+        for (int i = 0; i <= ResData.Count; i++)
+        {
+            strArray[i, 0] = bankId;
+            strArray[i, 1] = Convert.ToString(MatrixId);
+            strArray[i, 2] = Convert.ToString(MatrixName);
+            strArray[i, 3] = Convert.ToString(ResData.ElementAt(i).Key);
+            strArray[i, 4] = Convert.ToString(ResData.ElementAt(i).Value);
+            Console.WriteLine(strArray[i,0] + " " + strArray[i, 1] + " " + strArray[i, 2] + " "+ strArray[i, 3] + " "+ strArray[i, 4] + " ");
+        }
+    }
+
+    ////this function prints col A of spreadsheet - printing on console
+    //public void printcolA(string[,] strArray)
+    //{
+    //    for(int i=0;i<strArray.GetLength(0); i++) 
+    //    {
+    //        bool flag = true;
+    //        for (int j = 0; j < i; j++)
+    //        {
+    //            if (strArray[i, 2] == strArray[j, 2])
+    //            {
+    //                flag = false;
+    //                break;
+    //            }
+    //        }
+    //        if(flag) {
+    //            Console.WriteLine(strArray[i, 2]); }
+    //    }
+    //}
+
+    //function to print directly on spreadsheet
+    public void printcolA(string[,] strArray)
+    {
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("UniqueValues");
+
+            for (int i = 0; i < strArray.GetLength(0); i++)
+            {
+                bool flag = true;
+                for (int j = 0; j < i; j++)
+                {
+                    if (strArray[i, 2] == strArray[j, 2])
+                    {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag){                        
+                    //if Dimension is not set(if null) then defaults to row 1, otherwise +1 increments row counter, null check exception handler
+                    int newRow = worksheet.Dimension?.Rows + 1 ?? 1;
+                    worksheet.Cells[newRow, 1].Value = strArray[i, 2];}
+            }
+            package.SaveAs(new System.IO.FileInfo("UniqueValues.xlsx"));
+        }
+        Console.WriteLine("Unique values have been written to UniqueValues.xlsx");
+    }
